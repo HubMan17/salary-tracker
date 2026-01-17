@@ -16,4 +16,6 @@ class AppConstants {
   static const String updateCacheKey = 'cached_update_info';
   static const String lastUpdateCheckKey = 'last_update_check';
   static const Duration updateCacheValidity = Duration(hours: 6);
+
+  static const String onboardingCompletedKey = 'onboarding_completed';
 }

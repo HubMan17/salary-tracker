@@ -42,6 +42,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return value.replaceAll(' ', '');
   }
 
+  String _formatReleaseNotes(String notes) {
+    final lines = notes.split('\n');
+    final formatted = lines.map((line) {
+      var trimmed = line.trim();
+      if (trimmed.startsWith('###')) {
+        trimmed = trimmed.substring(3).trim();
+      } else if (trimmed.startsWith('##')) {
+        trimmed = trimmed.substring(2).trim();
+      } else if (trimmed.startsWith('#')) {
+        trimmed = trimmed.substring(1).trim();
+      }
+      return trimmed;
+    }).where((line) => line.isNotEmpty).join('\n');
+    return formatted;
+  }
+
   @override
   void dispose() {
     _salaryController.dispose();
@@ -460,7 +476,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        updateProvider.releaseNotes!,
+                        _formatReleaseNotes(updateProvider.releaseNotes!),
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,

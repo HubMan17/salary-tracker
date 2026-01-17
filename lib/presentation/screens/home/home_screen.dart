@@ -732,8 +732,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 56),
               _buildNavItem(
                   Icons.bar_chart_outlined, Icons.bar_chart, 'Статистика', 2),
-              _buildNavItem(
-                  Icons.settings_outlined, Icons.settings, 'Настройки', 3),
+              _buildSettingsNavItem(),
             ],
           ),
         ),
@@ -787,6 +786,60 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSettingsNavItem() {
+    return Consumer<UpdateProvider>(
+      builder: (context, updateProvider, _) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/settings').then((_) {
+              _recalculateSalary();
+            });
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(
+                    Icons.settings_outlined,
+                    color: AppColors.textMuted,
+                    size: 24,
+                  ),
+                  if (updateProvider.hasUpdate)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.accentGreen,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Настройки',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
