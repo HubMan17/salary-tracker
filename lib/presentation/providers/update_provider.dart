@@ -38,7 +38,7 @@ class UpdateProvider extends ChangeNotifier {
         _lastCheckSucceeded = true;
       }
     } catch (e) {
-      _error = 'Ошибка при проверке обновлений';
+      _error = 'Не удалось проверить обновления';
       debugPrint('Update check error: $e');
     } finally {
       _isChecking = false;

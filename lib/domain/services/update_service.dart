@@ -26,27 +26,22 @@ class UpdateService {
       }
     }
 
-    try {
-      final response = await http.get(
-        Uri.parse(AppConstants.githubReleasesApiUrl),
-        headers: {'Accept': 'application/vnd.github.v3+json'},
-      ).timeout(const Duration(seconds: 10));
+    final response = await http.get(
+      Uri.parse(AppConstants.githubReleasesApiUrl),
+      headers: {'Accept': 'application/vnd.github.v3+json'},
+    ).timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final updateInfo = UpdateInfo.fromGitHubJson(json, currentVersion);
-        await _cacheUpdate(updateInfo);
-        return updateInfo;
-      } else if (response.statusCode == 404) {
-        final info = UpdateInfo.noUpdate(currentVersion);
-        await _cacheUpdate(info);
-        return info;
-      } else {
-        return UpdateInfo.error(currentVersion);
-      }
-    } catch (e) {
-      debugPrint('Update check failed: $e');
-      return UpdateInfo.error(currentVersion);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final updateInfo = UpdateInfo.fromGitHubJson(json, currentVersion);
+      await _cacheUpdate(updateInfo);
+      return updateInfo;
+    } else if (response.statusCode == 404) {
+      final info = UpdateInfo.noUpdate(currentVersion);
+      await _cacheUpdate(info);
+      return info;
+    } else {
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
     }
   }
 
