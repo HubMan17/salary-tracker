@@ -22,13 +22,44 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _selectedDay;
   int _currentIndex = 0;
 
+  CalendarProvider? _calendarProvider;
+  SettingsProvider? _settingsProvider;
+
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_calendarProvider == null) {
+      _calendarProvider = context.read<CalendarProvider>();
+      _settingsProvider = context.read<SettingsProvider>();
+
+      _calendarProvider!.addListener(_onProvidersChanged);
+      _settingsProvider!.addListener(_onProvidersChanged);
+
+      _onProvidersChanged();
+    }
+  }
+
+  void _onProvidersChanged() {
+    if (_calendarProvider != null &&
+        _settingsProvider != null &&
+        !_calendarProvider!.isLoading &&
+        !_settingsProvider!.isLoading) {
       _recalculateSalary();
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    _calendarProvider?.removeListener(_onProvidersChanged);
+    _settingsProvider?.removeListener(_onProvidersChanged);
+    super.dispose();
   }
 
   void _recalculateSalary() {
