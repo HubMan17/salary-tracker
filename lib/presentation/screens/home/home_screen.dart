@@ -7,6 +7,7 @@ import '../../../core/utils/date_utils.dart';
 import '../../providers/calendar_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/salary_provider.dart';
+import '../../providers/update_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -140,15 +141,41 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () async {
-                        await Navigator.pushNamed(context, '/settings');
-                        _recalculateSalary();
+                    Consumer<UpdateProvider>(
+                      builder: (context, updateProvider, _) {
+                        return IconButton(
+                          onPressed: () async {
+                            await Navigator.pushNamed(context, '/settings');
+                            _recalculateSalary();
+                          },
+                          icon: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const Icon(
+                                Icons.settings_outlined,
+                                color: Colors.white,
+                              ),
+                              if (updateProvider.hasUpdate)
+                                Positioned(
+                                  right: -2,
+                                  top: -2,
+                                  child: Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accentGreen,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
                       },
-                      icon: const Icon(
-                        Icons.settings_outlined,
-                        color: Colors.white,
-                      ),
                     ),
                   ],
                 ),

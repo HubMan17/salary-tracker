@@ -143,4 +143,44 @@ class NotificationService {
     if (kIsWeb) return;
     await _notifications.cancelAll();
   }
+
+  Future<void> showUpdateNotification(String version, String? releaseNotes) async {
+    if (kIsWeb) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'daypay_update_channel',
+      'Обновления',
+      channelDescription: 'Уведомления о новых версиях приложения',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    String body = 'Нажмите, чтобы обновить приложение';
+    if (releaseNotes != null && releaseNotes.isNotEmpty) {
+      final firstLine = releaseNotes.split('\n').first.trim();
+      if (firstLine.isNotEmpty && firstLine.length <= 100) {
+        body = firstLine;
+      }
+    }
+
+    await _notifications.show(
+      100,
+      'Доступно обновление v$version',
+      body,
+      details,
+      payload: 'update',
+    );
+  }
 }
