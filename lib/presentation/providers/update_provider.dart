@@ -9,11 +9,13 @@ class UpdateProvider extends ChangeNotifier {
   UpdateInfo? _updateInfo;
   bool _isChecking = false;
   String? _error;
+  bool _lastCheckSucceeded = false;
 
   UpdateInfo? get updateInfo => _updateInfo;
   bool get isChecking => _isChecking;
   bool get hasUpdate => _updateInfo?.hasUpdate ?? false;
   String? get error => _error;
+  bool get isUpToDate => _lastCheckSucceeded && !hasUpdate && _updateInfo?.isError != true;
 
   String get currentVersion => _updateInfo?.currentVersion ?? '';
   String get latestVersion => _updateInfo?.latestVersion ?? '';
@@ -25,12 +27,15 @@ class UpdateProvider extends ChangeNotifier {
 
     _isChecking = true;
     _error = null;
+    _lastCheckSucceeded = false;
     notifyListeners();
 
     try {
       _updateInfo = await _service.checkForUpdates(forceCheck: forceCheck);
       if (_updateInfo?.isError == true) {
         _error = 'Не удалось проверить обновления';
+      } else {
+        _lastCheckSucceeded = true;
       }
     } catch (e) {
       _error = 'Ошибка при проверке обновлений';

@@ -578,6 +578,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
+              ] else if (updateProvider.isUpToDate) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'У вас последняя версия',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.accentGreen,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ],
           ),
