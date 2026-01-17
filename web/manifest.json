@@ -1,11 +1,11 @@
 {
-    "name": "salary_tracker",
-    "short_name": "salary_tracker",
+    "name": "DayPay",
+    "short_name": "DayPay",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#7C3AED",
+    "theme_color": "#7C3AED",
+    "description": "Real-time salary tracking app",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
