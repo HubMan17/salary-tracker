@@ -244,7 +244,7 @@ class _SalaryInputPageState extends State<SalaryInputPage> {
                       ),
                     )
                   : const Text(
-                      'Начать',
+                      'Далее',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

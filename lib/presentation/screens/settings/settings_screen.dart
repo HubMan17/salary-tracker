@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/update_provider.dart';
@@ -62,6 +63,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void dispose() {
     _salaryController.dispose();
     super.dispose();
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _sendEmail(String email) async {
+    final uri = Uri(scheme: 'mailto', path: email);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   Future<void> _saveSalary() async {
@@ -630,7 +645,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           _buildInfoRow('Разработчик', 'ZholobovA'),
+          const SizedBox(height: 16),
+          const Text(
+            'Связаться с разработчиком',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildContactButton(
+                icon: Icons.send_outlined,
+                label: 'Telegram',
+                color: const Color(0xFF26A5E4),
+                onTap: () => _launchUrl('https://t.me/sdxy_x'),
+              ),
+              const SizedBox(width: 8),
+              _buildContactButton(
+                icon: Icons.email_outlined,
+                label: 'Email',
+                color: AppColors.accentOrange,
+                onTap: () => _sendEmail('dzhanatly@gmail.com'),
+              ),
+              const SizedBox(width: 8),
+              _buildContactButton(
+                icon: Icons.code,
+                label: 'GitHub',
+                color: AppColors.textPrimary,
+                onTap: () => _launchUrl('https://github.com/HubMan17'),
+              ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildContactButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 22),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
