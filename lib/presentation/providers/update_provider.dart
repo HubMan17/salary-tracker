@@ -68,11 +68,20 @@ class UpdateProvider extends ChangeNotifier {
   }
 
   Future<void> startDownload() async {
-    final url = _updateInfo?.downloadUrl;
+    var url = _updateInfo?.downloadUrl;
+    debugPrint('startDownload called, url: $url');
+
     if (url == null) {
-      _downloadError = 'URL для загрузки не найден';
-      notifyListeners();
-      return;
+      debugPrint('URL is null, force checking for updates...');
+      await checkForUpdates(forceCheck: true);
+      url = _updateInfo?.downloadUrl;
+
+      if (url == null) {
+        _downloadError = 'URL для загрузки не найден';
+        _downloadStatus = DownloadStatus.failed;
+        notifyListeners();
+        return;
+      }
     }
 
     _downloadStatus = DownloadStatus.downloading;
