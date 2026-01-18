@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../domain/services/download_service.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/update_provider.dart';
 
@@ -401,6 +402,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, updateProvider, _) {
         final hasUpdate = updateProvider.hasUpdate;
         final isChecking = updateProvider.isChecking;
+        final downloadStatus = updateProvider.downloadStatus;
+        final isDownloading = downloadStatus == DownloadStatus.downloading;
+        final isDownloadComplete = downloadStatus == DownloadStatus.completed;
 
         return Container(
           padding: const EdgeInsets.all(20),
@@ -433,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  if (hasUpdate)
+                  if (hasUpdate && !isDownloading && !isDownloadComplete)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -469,7 +473,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   valueColor: AppColors.accentGreen,
                 ),
               ],
-              if (hasUpdate && updateProvider.releaseNotes != null) ...[
+              if (hasUpdate && updateProvider.releaseNotes != null && !isDownloading && !isDownloadComplete) ...[
                 const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
@@ -504,8 +508,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ],
+              if (isDownloading) ...[
+                const SizedBox(height: 16),
+                _buildDownloadProgress(updateProvider),
+              ],
+              if (isDownloadComplete) ...[
+                const SizedBox(height: 16),
+                _buildDownloadComplete(updateProvider),
+              ],
               const SizedBox(height: 16),
-              if (hasUpdate)
+              if (hasUpdate && !isDownloading && !isDownloadComplete)
                 SizedBox(
                   width: double.infinity,
                   child: Container(
@@ -514,7 +526,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ElevatedButton.icon(
-                      onPressed: () => updateProvider.downloadUpdate(),
+                      onPressed: () => updateProvider.startDownload(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -539,51 +551,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-              if (hasUpdate) const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: isChecking
-                      ? null
-                      : () => updateProvider.checkForUpdates(forceCheck: true),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(
-                      color: isChecking
-                          ? AppColors.textMuted
-                          : AppColors.primaryPurple,
+              if (hasUpdate && !isDownloading && !isDownloadComplete) const SizedBox(height: 10),
+              if (!isDownloading && !isDownloadComplete)
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: isChecking
+                        ? null
+                        : () => updateProvider.checkForUpdates(forceCheck: true),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: BorderSide(
+                        color: isChecking
+                            ? AppColors.textMuted
+                            : AppColors.primaryPurple,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  icon: isChecking
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                    icon: isChecking
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primaryPurple,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.refresh,
                             color: AppColors.primaryPurple,
+                            size: 20,
                           ),
-                        )
-                      : const Icon(
-                          Icons.refresh,
-                          color: AppColors.primaryPurple,
-                          size: 20,
-                        ),
-                  label: Text(
-                    isChecking ? 'Проверка...' : 'Проверить обновления',
-                    style: TextStyle(
-                      color: isChecking
-                          ? AppColors.textMuted
-                          : AppColors.primaryPurple,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                    label: Text(
+                      isChecking ? 'Проверка...' : 'Проверить обновления',
+                      style: TextStyle(
+                        color: isChecking
+                            ? AppColors.textMuted
+                            : AppColors.primaryPurple,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (updateProvider.error != null) ...[
+              if (updateProvider.error != null && !isDownloading && !isDownloadComplete) ...[
                 const SizedBox(height: 12),
                 Text(
                   updateProvider.error!,
@@ -593,7 +606,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ] else if (updateProvider.isUpToDate) ...[
+              ] else if (updateProvider.isUpToDate && !isDownloading && !isDownloadComplete) ...[
                 const SizedBox(height: 12),
                 const Text(
                   'У вас последняя версия',
@@ -604,10 +617,205 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textAlign: TextAlign.center,
                 ),
               ],
+              if (updateProvider.downloadError != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  updateProvider.downloadError!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.accentRed,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDownloadProgress(UpdateProvider provider) {
+    final progress = provider.downloadProgress;
+    final percent = (progress * 100).toInt();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryPurple.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.primaryPurple.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primaryPurple,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Загрузка обновления... $percent%',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: AppColors.primaryPurple.withValues(alpha: 0.1),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryPurple),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => provider.cancelDownload(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                side: const BorderSide(color: AppColors.textMuted),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Отменить',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDownloadComplete(UpdateProvider provider) {
+    final isInstalling = provider.downloadStatus == DownloadStatus.installing;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.accentGreen.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.accentGreen.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.accentGreen.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: AppColors.accentGreen,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Обновление загружено',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ElevatedButton.icon(
+                onPressed: isInstalling ? null : () => provider.installUpdate(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                icon: isInstalling
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.system_update,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                label: Text(
+                  isInstalling ? 'Установка...' : 'Установить',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => provider.resetDownloadState(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                side: const BorderSide(color: AppColors.textMuted),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Отмена',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

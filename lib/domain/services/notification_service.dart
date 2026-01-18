@@ -183,4 +183,112 @@ class NotificationService {
       payload: 'update',
     );
   }
+
+  Future<void> showDownloadProgressNotification(int progress, String version) async {
+    if (kIsWeb) return;
+
+    final androidDetails = AndroidNotificationDetails(
+      'daypay_download_channel',
+      'Загрузка',
+      channelDescription: 'Уведомления о загрузке обновлений',
+      importance: Importance.low,
+      priority: Priority.low,
+      icon: '@mipmap/ic_launcher',
+      showProgress: true,
+      maxProgress: 100,
+      progress: progress,
+      onlyAlertOnce: true,
+      ongoing: true,
+      autoCancel: false,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: false,
+      presentBadge: false,
+      presentSound: false,
+    );
+
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notifications.show(
+      101,
+      'Загрузка обновления v$version',
+      'Загружено $progress%',
+      details,
+    );
+  }
+
+  Future<void> showDownloadCompleteNotification(String version) async {
+    if (kIsWeb) return;
+
+    await _notifications.cancel(101);
+
+    const androidDetails = AndroidNotificationDetails(
+      'daypay_update_channel',
+      'Обновления',
+      channelDescription: 'Уведомления о новых версиях приложения',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notifications.show(
+      102,
+      'Обновление v$version загружено',
+      'Нажмите, чтобы установить',
+      details,
+      payload: 'install_update',
+    );
+  }
+
+  Future<void> cancelDownloadNotification() async {
+    if (kIsWeb) return;
+    await _notifications.cancel(101);
+  }
+
+  Future<void> showUpdateAvailableOnStartup(String version) async {
+    if (kIsWeb) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'daypay_update_channel',
+      'Обновления',
+      channelDescription: 'Уведомления о новых версиях приложения',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notifications.show(
+      103,
+      'Доступна новая версия v$version',
+      'Откройте настройки, чтобы обновить',
+      details,
+      payload: 'update',
+    );
+  }
 }
