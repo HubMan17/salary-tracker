@@ -112,7 +112,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
         context.read<CalendarProvider>().getRecordForDate(_date);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: CustomScrollView(
         slivers: [
           _buildHeader(existingRecord != null),
@@ -216,7 +216,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
   Widget _buildTypeCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -235,12 +235,12 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Тип дня',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -268,7 +268,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? color.withValues(alpha: 0.1)
-              : AppColors.backgroundLight,
+              : context.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
@@ -293,7 +293,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color:
-                      isSelected ? AppColors.textPrimary : AppColors.textSecondary,
+                      isSelected ? context.textPrimary : context.textSecondary,
                 ),
               ),
             ),
@@ -319,7 +319,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
   Widget _buildBonusCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -338,12 +338,12 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Дополнительный бонус',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -355,26 +355,26 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
             ],
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: '0',
               hintStyle: TextStyle(
-                color: AppColors.textMuted.withValues(alpha: 0.5),
+                color: context.textMuted.withValues(alpha: 0.5),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
               suffixText: '₽',
-              suffixStyle: const TextStyle(
+              suffixStyle: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               filled: true,
-              fillColor: AppColors.backgroundLight,
+              fillColor: context.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -386,11 +386,11 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Премия, доплата или другие начисления за этот день',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.textMuted,
+              color: context.textMuted,
             ),
           ),
         ],

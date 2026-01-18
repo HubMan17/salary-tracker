@@ -993,7 +993,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildContactButton(
                 icon: Icons.code,
                 label: 'GitHub',
-                color: AppColors.textPrimary,
+                color: context.textPrimary,
                 onTap: () => _launchUrl('https://github.com/HubMan17'),
               ),
             ],

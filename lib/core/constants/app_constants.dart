@@ -15,7 +15,10 @@ class AppConstants {
       'https://api.github.com/repos/HubMan17/salary-tracker/releases/latest';
   static const String updateCacheKey = 'cached_update_info';
   static const String lastUpdateCheckKey = 'last_update_check';
+  static const String lastUpdateNotificationKey = 'last_update_notification';
+  static const String lastNotifiedVersionKey = 'last_notified_version';
   static const Duration updateCacheValidity = Duration(hours: 6);
+  static const Duration updateNotificationInterval = Duration(hours: 12);
 
   static const String onboardingCompletedKey = 'onboarding_completed';
 }

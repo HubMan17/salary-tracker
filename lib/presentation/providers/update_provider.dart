@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../data/models/update_info.dart';
 import '../../domain/services/download_service.dart';
 import '../../domain/services/notification_service.dart';
@@ -53,9 +55,7 @@ class UpdateProvider extends ChangeNotifier {
       } else {
         _lastCheckSucceeded = true;
         if (showNotification && _updateInfo?.hasUpdate == true) {
-          await _notificationService.showUpdateAvailableOnStartup(
-            _updateInfo!.latestVersion,
-          );
+          await _showUpdateNotificationIfNeeded(_updateInfo!.latestVersion);
         }
       }
     } catch (e) {
@@ -64,6 +64,42 @@ class UpdateProvider extends ChangeNotifier {
     } finally {
       _isChecking = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> _showUpdateNotificationIfNeeded(String version) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastNotifiedVersion = prefs.getString(AppConstants.lastNotifiedVersionKey);
+      final lastNotificationStr = prefs.getString(AppConstants.lastUpdateNotificationKey);
+
+      bool shouldShow = false;
+
+      if (lastNotifiedVersion != version) {
+        shouldShow = true;
+      } else if (lastNotificationStr != null) {
+        final lastNotification = DateTime.tryParse(lastNotificationStr);
+        if (lastNotification != null) {
+          final diff = DateTime.now().difference(lastNotification);
+          if (diff >= AppConstants.updateNotificationInterval) {
+            shouldShow = true;
+          }
+        }
+      } else {
+        shouldShow = true;
+      }
+
+      if (shouldShow) {
+        await _notificationService.showUpdateAvailableOnStartup(version);
+        await prefs.setString(
+          AppConstants.lastUpdateNotificationKey,
+          DateTime.now().toIso8601String(),
+        );
+        await prefs.setString(AppConstants.lastNotifiedVersionKey, version);
+      }
+    } catch (e) {
+      debugPrint('Notification check error: $e');
+      await _notificationService.showUpdateAvailableOnStartup(version);
     }
   }
 
