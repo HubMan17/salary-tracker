@@ -13,7 +13,7 @@ class CalendarProvider extends ChangeNotifier {
   DateTime _selectedMonth = DateTime.now();
   Map<String, DayRecord> _dayRecords = {};
   List<BusinessTrip> _trips = [];
-  bool _isLoading = false;
+  bool _isInitialLoading = true;
 
   CalendarProvider({
     DayRecordRepository? dayRecordRepository,
@@ -25,7 +25,7 @@ class CalendarProvider extends ChangeNotifier {
   DateTime get selectedMonth => _selectedMonth;
   List<DayRecord> get records => _dayRecords.values.toList();
   List<BusinessTrip> get trips => _trips;
-  bool get isLoading => _isLoading;
+  bool get isLoading => _isInitialLoading;
 
   Map<int, BusinessTrip> get tripsById {
     return {for (final trip in _trips) if (trip.id != null) trip.id!: trip};
@@ -33,8 +33,6 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadMonth(int year, int month) async {
     _selectedMonth = DateTime(year, month);
-    _isLoading = true;
-    notifyListeners();
 
     try {
       final recordsList = await _dayRecordRepository.getByMonth(year, month);
@@ -44,7 +42,7 @@ class CalendarProvider extends ChangeNotifier {
 
       _trips = await _businessTripRepository.getByMonth(year, month);
     } finally {
-      _isLoading = false;
+      _isInitialLoading = false;
       notifyListeners();
     }
   }

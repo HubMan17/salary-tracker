@@ -7,14 +7,18 @@ class SalaryInputPage extends StatefulWidget {
   final double initialSalary;
   final ValueChanged<double> onSalaryChanged;
   final VoidCallback onBack;
-  final VoidCallback onNext;
+  final VoidCallback onComplete;
+  final bool canComplete;
+  final bool isLoading;
 
   const SalaryInputPage({
     super.key,
     required this.initialSalary,
     required this.onSalaryChanged,
     required this.onBack,
-    required this.onNext,
+    required this.onComplete,
+    required this.canComplete,
+    this.isLoading = false,
   });
 
   @override
@@ -186,16 +190,21 @@ class _SalaryInputPageState extends State<SalaryInputPage> {
   }
 
   Widget _buildButtons() {
+    final canProceed = widget.canComplete && !widget.isLoading;
+
     return Row(
       children: [
         Expanded(
           child: SizedBox(
             height: 56,
             child: OutlinedButton(
-              onPressed: widget.onBack,
+              onPressed: widget.isLoading ? null : widget.onBack,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white, width: 2),
+                side: BorderSide(
+                  color: widget.isLoading ? Colors.white.withOpacity(0.5) : Colors.white,
+                  width: 2,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -215,22 +224,32 @@ class _SalaryInputPageState extends State<SalaryInputPage> {
           child: SizedBox(
             height: 56,
             child: ElevatedButton(
-              onPressed: widget.onNext,
+              onPressed: canProceed ? widget.onComplete : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: AppColors.primaryPurple,
+                disabledBackgroundColor: Colors.white.withOpacity(0.5),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
-                'Далее',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: widget.isLoading
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primaryPurple.withOpacity(0.5),
+                      ),
+                    )
+                  : const Text(
+                      'Начать',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ),
         ),

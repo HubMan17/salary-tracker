@@ -6,7 +6,6 @@ import '../../providers/onboarding_provider.dart';
 import '../../providers/settings_provider.dart';
 import 'widgets/welcome_page.dart';
 import 'widgets/salary_input_page.dart';
-import 'widgets/completion_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -42,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_onboardingProvider.currentPage < 2) {
+    if (_onboardingProvider.currentPage < 1) {
       _goToPage(_onboardingProvider.currentPage + 1);
     }
   }
@@ -89,14 +88,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             initialSalary: provider.enteredSalary,
                             onSalaryChanged: provider.setSalary,
                             onBack: _previousPage,
-                            onNext: _nextPage,
-                          );
-                        },
-                      ),
-                      Consumer<OnboardingProvider>(
-                        builder: (context, provider, _) {
-                          return CompletionPage(
                             onComplete: _completeOnboarding,
+                            canComplete: provider.canProceedFromSalary,
                             isLoading: provider.isCompleting,
                           );
                         },
@@ -117,7 +110,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       builder: (context, provider, _) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(3, (index) {
+          children: List.generate(2, (index) {
             final isActive = index == provider.currentPage;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),

@@ -89,16 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.backgroundLight,
       body: Consumer3<SettingsProvider, CalendarProvider, SalaryProvider>(
         builder: (context, settings, calendar, salary, _) {
-          if (settings.isLoading || calendar.isLoading) {
+          if (settings.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
                 color: AppColors.primaryPurple,
               ),
             );
-          }
-
-          if (!settings.hasSetSalary) {
-            return _buildEmptyState();
           }
 
           return CustomScrollView(
@@ -112,10 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       bottomNavigationBar: _buildBottomNav(),
-      floatingActionButton: Consumer<SettingsProvider>(
-        builder: (context, settings, _) {
-          if (!settings.hasSetSalary) return const SizedBox.shrink();
-          return Container(
+      floatingActionButton: Container(
             decoration: BoxDecoration(
               gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(16),
@@ -127,20 +120,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            child: FloatingActionButton(
-              onPressed: () async {
-                await Navigator.pushNamed(context, '/business-trip');
-                if (mounted) {
-                  context.read<CalendarProvider>().refreshCurrentMonth();
-                  _recalculateSalary();
-                }
-              },
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              child: const Icon(Icons.add, color: Colors.white, size: 28),
-            ),
-          );
-        },
+        child: FloatingActionButton(
+          onPressed: () async {
+            await Navigator.pushNamed(context, '/business-trip');
+            if (mounted) {
+              context.read<CalendarProvider>().refreshCurrentMonth();
+              _recalculateSalary();
+            }
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
+        ),
       ),
     );
   }
@@ -443,6 +434,7 @@ class _HomeScreenState extends State<HomeScreen> {
         calendarFormat: _calendarFormat,
         startingDayOfWeek: StartingDayOfWeek.monday,
         availableCalendarFormats: const {CalendarFormat.month: 'Месяц'},
+        availableGestures: AvailableGestures.none,
         selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
         daysOfWeekHeight: 32,
         rowHeight: 42,
@@ -665,76 +657,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.headerGradient,
-      ),
-      child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 64,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Добро пожаловать!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Укажите ваш оклад в настройках,\nчтобы начать отслеживать зарплату',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withValues(alpha: 0.8),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await Navigator.pushNamed(context, '/settings');
-                    _recalculateSalary();
-                  },
-                  icon: const Icon(Icons.settings),
-                  label: const Text('Открыть настройки'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppColors.primaryPurple,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
