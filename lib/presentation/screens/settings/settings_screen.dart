@@ -105,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: CustomScrollView(
         slivers: [
           _buildHeader(),
@@ -169,6 +169,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildSalaryCard(),
               const SizedBox(height: 16),
+              _buildThemeCard(provider),
+              const SizedBox(height: 16),
               _buildNotificationsCard(provider),
               const SizedBox(height: 16),
               _buildVersionCard(),
@@ -184,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSalaryCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -203,12 +205,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Месячный оклад',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -220,26 +222,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[\d ]')),
             ],
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: '80 000',
               hintStyle: TextStyle(
-                color: AppColors.textMuted.withValues(alpha: 0.5),
+                color: context.textMuted.withValues(alpha: 0.5),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
               suffixText: '₽',
-              suffixStyle: const TextStyle(
+              suffixStyle: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               filled: true,
-              fillColor: AppColors.backgroundLight,
+              fillColor: context.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -310,10 +312,119 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildThemeCard(SettingsProvider provider) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: context.cardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.palette_outlined,
+                  color: AppColors.primaryBlue,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Тема оформления',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: context.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildThemeOption(
+            provider,
+            'system',
+            'Системная',
+            Icons.settings_suggest_outlined,
+          ),
+          const SizedBox(height: 8),
+          _buildThemeOption(
+            provider,
+            'light',
+            'Светлая',
+            Icons.light_mode_outlined,
+          ),
+          const SizedBox(height: 8),
+          _buildThemeOption(
+            provider,
+            'dark',
+            'Тёмная',
+            Icons.dark_mode_outlined,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(
+    SettingsProvider provider,
+    String value,
+    String label,
+    IconData icon,
+  ) {
+    final isSelected = provider.themeModeString == value;
+    return InkWell(
+      onTap: () => provider.updateThemeMode(value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryPurple.withValues(alpha: 0.1)
+              : context.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(color: AppColors.primaryPurple, width: 1.5)
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primaryPurple : context.textSecondary,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? AppColors.primaryPurple : context.textPrimary,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryPurple,
+                size: 22,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildNotificationsCard(SettingsProvider provider) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -332,12 +443,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Уведомления',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -346,7 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
+              color: context.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -360,20 +471,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Напоминание о зарплате',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
+                                color: context.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'За ${provider.settings.notifyDaysBefore} дня до конца месяца',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                           ],
@@ -408,7 +519,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         return Container(
           padding: const EdgeInsets.all(20),
-          decoration: AppDecorations.card,
+          decoration: context.cardDecoration,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -427,13 +538,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Версия',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -479,26 +590,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Что нового:',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         _formatReleaseNotes(updateProvider.releaseNotes!),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondary,
                           height: 1.4,
                         ),
                         maxLines: 10,
@@ -738,13 +849,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Обновление загружено',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -822,7 +933,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildInfoCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -841,12 +952,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'О приложении',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -854,12 +965,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 16),
           _buildInfoRow('Разработчик', 'ZholobovA'),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Связаться с разработчиком',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 12),
@@ -931,7 +1042,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: context.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -939,9 +1050,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           Text(
@@ -949,7 +1060,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: valueColor ?? AppColors.textPrimary,
+              color: valueColor ?? context.textPrimary,
             ),
           ),
         ],

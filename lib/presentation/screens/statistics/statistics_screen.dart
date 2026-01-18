@@ -77,7 +77,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: Consumer3<SettingsProvider, CalendarProvider, SalaryProvider>(
         builder: (context, settings, calendar, salary, _) {
           if (settings.isLoading || calendar.isLoading) {
@@ -90,9 +90,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
           return CustomScrollView(
             slivers: [
-              _buildHeader(salary, calendar),
+              _buildHeader(context, salary, calendar),
               SliverToBoxAdapter(
-                child: _buildContent(salary, calendar),
+                child: _buildContent(context, salary, calendar),
               ),
             ],
           );
@@ -101,7 +101,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _buildHeader(SalaryProvider salary, CalendarProvider calendar) {
+  Widget _buildHeader(BuildContext context, SalaryProvider salary, CalendarProvider calendar) {
     return SliverToBoxAdapter(
       child: Container(
         decoration: const BoxDecoration(
@@ -209,15 +209,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _buildContent(SalaryProvider salary, CalendarProvider calendar) {
+  Widget _buildContent(BuildContext context, SalaryProvider salary, CalendarProvider calendar) {
     final summary = salary.summary;
     if (summary == null) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(32),
         child: Center(
           child: Text(
             'Нет данных для отображения',
-            style: TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: context.textSecondary),
           ),
         ),
       );
@@ -227,18 +227,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildBreakdownChart(summary),
+          _buildBreakdownChart(context, summary),
           const SizedBox(height: 16),
-          _buildBreakdownDetails(summary),
+          _buildBreakdownDetails(context, summary),
           const SizedBox(height: 16),
-          _buildDaysStats(summary),
+          _buildDaysStats(context, summary),
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildBreakdownChart(dynamic summary) {
+  Widget _buildBreakdownChart(BuildContext context, dynamic summary) {
     final baseSalary = summary.baseSalaryEarned ?? 0.0;
     final sickLeave = summary.sickLeaveAmount ?? 0.0;
     final businessTrip = summary.businessTripAllowance ?? 0.0;
@@ -248,11 +248,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     if (total <= 0) {
       return Container(
         padding: const EdgeInsets.all(20),
-        decoration: AppDecorations.card,
-        child: const Center(
+        decoration: context.cardDecoration,
+        child: Center(
           child: Text(
             'Нет данных для графика',
-            style: TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: context.textSecondary),
           ),
         ),
       );
@@ -260,7 +260,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -279,12 +279,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Структура дохода',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -330,26 +330,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildLegend(),
+          _buildLegend(context),
         ],
       ),
     );
   }
 
-  Widget _buildLegend() {
+  Widget _buildLegend(BuildContext context) {
     return Wrap(
       spacing: 16,
       runSpacing: 8,
       children: [
-        _buildLegendItem('Оклад', AppColors.accentGreen),
-        _buildLegendItem('Больничный', AppColors.primaryBlue),
-        _buildLegendItem('Суточные', AppColors.primaryPurple),
-        _buildLegendItem('Бонусы', AppColors.accentOrange),
+        _buildLegendItem(context, 'Оклад', AppColors.accentGreen),
+        _buildLegendItem(context, 'Больничный', AppColors.primaryBlue),
+        _buildLegendItem(context, 'Суточные', AppColors.primaryPurple),
+        _buildLegendItem(context, 'Бонусы', AppColors.accentOrange),
       ],
     );
   }
 
-  Widget _buildLegendItem(String label, Color color) {
+  Widget _buildLegendItem(BuildContext context, String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -364,19 +364,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBreakdownDetails(dynamic summary) {
+  Widget _buildBreakdownDetails(BuildContext context, dynamic summary) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -395,36 +395,40 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Детализация',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           _buildDetailRow(
+            context,
             'Базовый оклад',
             _formatCurrency(summary.baseSalaryEarned ?? 0),
             AppColors.accentGreen,
           ),
           const SizedBox(height: 8),
           _buildDetailRow(
+            context,
             'Больничные',
             _formatCurrency(summary.sickLeaveAmount ?? 0),
             AppColors.primaryBlue,
           ),
           const SizedBox(height: 8),
           _buildDetailRow(
+            context,
             'Суточные (командировки)',
             _formatCurrency(summary.businessTripAllowance ?? 0),
             AppColors.primaryPurple,
           ),
           const SizedBox(height: 8),
           _buildDetailRow(
+            context,
             'Бонусы и доплаты',
             _formatCurrency(summary.totalBonuses ?? 0),
             AppColors.accentOrange,
@@ -463,11 +467,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, Color color) {
+  Widget _buildDetailRow(BuildContext context, String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: context.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -484,18 +488,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
         ],
@@ -503,10 +507,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _buildDaysStats(dynamic summary) {
+  Widget _buildDaysStats(BuildContext context, dynamic summary) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -525,12 +529,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Статистика дней',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -540,6 +544,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             children: [
               Expanded(
                 child: _buildDayStatCard(
+                  context,
                   'Рабочих дней',
                   '${summary.workedDays ?? 0}',
                   'из ${summary.totalWorkDaysInMonth ?? 0}',
@@ -550,6 +555,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildDayStatCard(
+                  context,
                   'Больничных',
                   '${summary.sickDays ?? 0}',
                   'дней',
@@ -564,6 +570,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             children: [
               Expanded(
                 child: _buildDayStatCard(
+                  context,
                   'Командировок',
                   '${summary.businessTripDays ?? 0}',
                   'дней',
@@ -574,6 +581,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildDayStatCard(
+                  context,
                   'Ставка/день',
                   _formatCurrency(summary.dailyRate ?? 0),
                   '',
@@ -589,6 +597,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   }
 
   Widget _buildDayStatCard(
+    BuildContext context,
     String label,
     String value,
     String subtitle,
@@ -618,18 +627,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textMuted,
+                color: context.textMuted,
               ),
             ),
           ],
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],

@@ -3,12 +3,14 @@ class Settings {
   final double monthlySalary;
   final bool notificationsEnabled;
   final int notifyDaysBefore;
+  final String themeMode;
 
   const Settings({
     this.id,
     required this.monthlySalary,
     this.notificationsEnabled = true,
     this.notifyDaysBefore = 2,
+    this.themeMode = 'system',
   });
 
   double getDailyRate(int workDaysInMonth) {
@@ -22,6 +24,7 @@ class Settings {
       'monthly_salary': monthlySalary,
       'notifications_enabled': notificationsEnabled ? 1 : 0,
       'notify_days_before': notifyDaysBefore,
+      'theme_mode': themeMode,
     };
   }
 
@@ -31,6 +34,7 @@ class Settings {
       monthlySalary: (map['monthly_salary'] as num).toDouble(),
       notificationsEnabled: map['notifications_enabled'] == 1,
       notifyDaysBefore: map['notify_days_before'] as int? ?? 2,
+      themeMode: map['theme_mode'] as String? ?? 'system',
     );
   }
 
@@ -39,12 +43,14 @@ class Settings {
     double? monthlySalary,
     bool? notificationsEnabled,
     int? notifyDaysBefore,
+    String? themeMode,
   }) {
     return Settings(
       id: id ?? this.id,
       monthlySalary: monthlySalary ?? this.monthlySalary,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       notifyDaysBefore: notifyDaysBefore ?? this.notifyDaysBefore,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 

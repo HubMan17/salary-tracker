@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../../data/models/settings.dart';
 import '../../data/repositories/settings_repository.dart';
 
@@ -15,6 +15,18 @@ class SettingsProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   double get monthlySalary => _settings.monthlySalary;
   bool get hasSetSalary => _settings.monthlySalary > 0;
+  String get themeModeString => _settings.themeMode;
+
+  ThemeMode get themeMode {
+    switch (_settings.themeMode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  }
 
   Future<void> loadSettings() async {
     _isLoading = true;
@@ -46,6 +58,12 @@ class SettingsProvider extends ChangeNotifier {
       notificationsEnabled: enabled ?? _settings.notificationsEnabled,
       notifyDaysBefore: daysBefore ?? _settings.notifyDaysBefore,
     );
+    notifyListeners();
+  }
+
+  Future<void> updateThemeMode(String mode) async {
+    await _repository.updateThemeMode(mode);
+    _settings = _settings.copyWith(themeMode: mode);
     notifyListeners();
   }
 }

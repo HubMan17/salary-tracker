@@ -78,14 +78,14 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: Consumer3<SettingsProvider, CalendarProvider, SalaryProvider>(
         builder: (context, settings, calendar, salary, _) {
           return CustomScrollView(
             slivers: [
-              _buildHeader(salary),
+              _buildHeader(context, salary),
               SliverToBoxAdapter(
-                child: _buildContent(calendar, salary, settings),
+                child: _buildContent(context, calendar, salary, settings),
               ),
             ],
           );
@@ -94,7 +94,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
     );
   }
 
-  Widget _buildHeader(SalaryProvider salary) {
+  Widget _buildHeader(BuildContext context, SalaryProvider salary) {
     return SliverToBoxAdapter(
       child: Container(
         decoration: const BoxDecoration(
@@ -203,6 +203,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
   }
 
   Widget _buildContent(
+    BuildContext context,
     CalendarProvider calendar,
     SalaryProvider salary,
     SettingsProvider settings,
@@ -240,34 +241,34 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildLegend(),
+          _buildLegend(context),
           const SizedBox(height: 16),
-          _buildDaysList(reportItems),
+          _buildDaysList(context, reportItems),
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildLegend() {
+  Widget _buildLegend(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Wrap(
         spacing: 16,
         runSpacing: 8,
         children: [
-          _buildLegendItem('Рабочий', AppColors.accentGreen),
-          _buildLegendItem('Выходной', AppColors.textMuted),
-          _buildLegendItem('Больничный', AppColors.primaryBlue),
-          _buildLegendItem('Командировка', AppColors.primaryPurple),
-          _buildLegendItem('Работа в вых.', AppColors.accentOrange),
+          _buildLegendItem(context, 'Рабочий', AppColors.accentGreen),
+          _buildLegendItem(context, 'Выходной', context.textMuted),
+          _buildLegendItem(context, 'Больничный', AppColors.primaryBlue),
+          _buildLegendItem(context, 'Командировка', AppColors.primaryPurple),
+          _buildLegendItem(context, 'Работа в вых.', AppColors.accentOrange),
         ],
       ),
     );
   }
 
-  Widget _buildLegendItem(String label, Color color) {
+  Widget _buildLegendItem(BuildContext context, String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -282,26 +283,26 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDaysList(List<_DayReportItem> items) {
+  Widget _buildDaysList(BuildContext context, List<_DayReportItem> items) {
     return Container(
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
-        children: items.map((item) => _buildDayRow(item)).toList(),
+        children: items.map((item) => _buildDayRow(context, item)).toList(),
       ),
     );
   }
 
-  Widget _buildDayRow(_DayReportItem item) {
-    final color = _getTypeColor(item.dayType);
+  Widget _buildDayRow(BuildContext context, _DayReportItem item) {
+    final color = _getTypeColor(context, item.dayType);
     final isWeekend = item.date.weekday >= 6;
 
     return Container(
@@ -309,7 +310,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: AppColors.backgroundLight,
+            color: context.surface,
             width: 1,
           ),
         ),
@@ -332,7 +333,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isWeekend ? AppColors.textMuted : AppColors.textPrimary,
+                color: isWeekend ? context.textMuted : context.textPrimary,
               ),
             ),
           ),
@@ -343,7 +344,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
               _getDayOfWeekShort(item.date.weekday),
               style: TextStyle(
                 fontSize: 12,
-                color: isWeekend ? AppColors.accentOrange : AppColors.textSecondary,
+                color: isWeekend ? AppColors.accentOrange : context.textSecondary,
               ),
             ),
           ),
@@ -353,7 +354,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
               item.dayType.displayName,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -365,7 +366,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
                 color: AppColors.accentOrange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Text(
+              child: const Text(
                 '+бонус',
                 style: TextStyle(
                   fontSize: 10,
@@ -379,7 +380,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: item.total > 0 ? AppColors.textPrimary : AppColors.textMuted,
+              color: item.total > 0 ? context.textPrimary : context.textMuted,
             ),
           ),
         ],
@@ -392,14 +393,14 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
     return days[weekday - 1];
   }
 
-  Color _getTypeColor(DayType type) {
+  Color _getTypeColor(BuildContext context, DayType type) {
     switch (type) {
       case DayType.workDay:
         return AppColors.accentGreen;
       case DayType.weekendWork:
         return AppColors.accentOrange;
       case DayType.dayOff:
-        return AppColors.textMuted;
+        return context.textMuted;
       case DayType.sickLeave:
         return AppColors.primaryBlue;
       case DayType.businessTrip:

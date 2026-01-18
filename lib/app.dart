@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'main.dart' show navigatorKey;
+import 'presentation/providers/settings_provider.dart';
 import 'presentation/screens/startup/startup_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
@@ -17,32 +19,38 @@ class SalaryTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'Учёт зарплаты',
-      debugShowCheckedModeBanner: false,
-      locale: const Locale('ru', 'RU'),
-      supportedLocales: const [
-        Locale('ru', 'RU'),
-        Locale('en', 'US'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.lightTheme,
-      initialRoute: '/startup',
-      routes: {
-        '/startup': (context) => const StartupScreen(),
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/': (context) => const HomeScreen(),
-        '/settings': (context) => const SettingsScreen(),
-        '/day-editor': (context) => const DayEditorScreen(),
-        '/business-trip': (context) => const BusinessTripScreen(),
-        '/day-detail': (context) => const DayDetailScreen(),
-        '/statistics': (context) => const StatisticsScreen(),
-        '/month-report': (context) => const MonthReportScreen(),
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, _) {
+        return MaterialApp(
+          navigatorKey: navigatorKey,
+          title: 'Учёт зарплаты',
+          debugShowCheckedModeBanner: false,
+          locale: const Locale('ru', 'RU'),
+          supportedLocales: const [
+            Locale('ru', 'RU'),
+            Locale('en', 'US'),
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: settingsProvider.themeMode,
+          initialRoute: '/startup',
+          routes: {
+            '/startup': (context) => const StartupScreen(),
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/': (context) => const HomeScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/day-editor': (context) => const DayEditorScreen(),
+            '/business-trip': (context) => const BusinessTripScreen(),
+            '/day-detail': (context) => const DayDetailScreen(),
+            '/statistics': (context) => const StatisticsScreen(),
+            '/month-report': (context) => const MonthReportScreen(),
+          },
+        );
       },
     );
   }

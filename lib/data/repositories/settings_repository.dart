@@ -24,4 +24,9 @@ class SettingsRepository {
       notifyDaysBefore: daysBefore ?? current.notifyDaysBefore,
     ));
   }
+
+  Future<void> updateThemeMode(String mode) async {
+    final current = await getSettings();
+    await updateSettings(current.copyWith(themeMode: mode));
+  }
 }

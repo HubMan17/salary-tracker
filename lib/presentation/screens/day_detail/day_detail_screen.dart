@@ -21,13 +21,13 @@ class DayDetailScreen extends StatelessWidget {
     final date = ModalRoute.of(context)?.settings.arguments as DateTime?;
     if (date == null) {
       return Scaffold(
-        backgroundColor: AppColors.backgroundLight,
-        body: const Center(child: Text('Дата не указана')),
+        backgroundColor: context.background,
+        body: Center(child: Text('Дата не указана', style: TextStyle(color: context.textPrimary))),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: Consumer3<CalendarProvider, SettingsProvider, SalaryProvider>(
         builder: (context, calendar, settings, salary, _) {
           final record = calendar.getRecordForDate(date);
@@ -135,20 +135,20 @@ class DayDetailScreen extends StatelessWidget {
       child: Column(
         children: [
           if (breakdown != null) ...[
-            _buildTypeCard(breakdown),
+            _buildTypeCard(context, breakdown),
             const SizedBox(height: 16),
-            _buildDetailsCard(breakdown),
+            _buildDetailsCard(context, breakdown),
           ],
           if (businessTrip != null) ...[
             const SizedBox(height: 16),
-            _buildTripCard(businessTrip),
+            _buildTripCard(context, businessTrip),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildTypeCard(dynamic breakdown) {
+  Widget _buildTypeCard(BuildContext context, dynamic breakdown) {
     Color accentColor;
     IconData icon;
 
@@ -162,7 +162,7 @@ class DayDetailScreen extends StatelessWidget {
         icon = Icons.weekend_outlined;
         break;
       case 'Выходной':
-        accentColor = AppColors.textMuted;
+        accentColor = context.textMuted;
         icon = Icons.bed_outlined;
         break;
       case 'Больничный':
@@ -174,13 +174,13 @@ class DayDetailScreen extends StatelessWidget {
         icon = Icons.flight_takeoff_outlined;
         break;
       default:
-        accentColor = AppColors.textSecondary;
+        accentColor = context.textSecondary;
         icon = Icons.help_outline;
     }
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Row(
         children: [
           Container(
@@ -196,20 +196,20 @@ class DayDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Тип дня',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   breakdown.typeName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ],
@@ -220,10 +220,10 @@ class DayDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsCard(dynamic breakdown) {
+  Widget _buildDetailsCard(BuildContext context, dynamic breakdown) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -242,12 +242,12 @@ class DayDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Детализация',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -257,17 +257,17 @@ class DayDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: context.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.textMuted, size: 20),
-                  SizedBox(width: 8),
+                  Icon(Icons.info_outline, color: context.textMuted, size: 20),
+                  const SizedBox(width: 8),
                   Text(
                     'Нет начислений за этот день',
-                    style: TextStyle(color: AppColors.textMuted),
+                    style: TextStyle(color: context.textMuted),
                   ),
                 ],
               ),
@@ -278,7 +278,7 @@ class DayDetailScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.surface,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -286,17 +286,17 @@ class DayDetailScreen extends StatelessWidget {
                     children: [
                       Text(
                         item.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                       Text(
                         _formatCurrency(item.amount),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                     ],
@@ -336,10 +336,10 @@ class DayDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTripCard(dynamic businessTrip) {
+  Widget _buildTripCard(BuildContext context, dynamic businessTrip) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -358,34 +358,38 @@ class DayDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Командировка',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
           _buildTripInfoRow(
+            context,
             Icons.date_range_outlined,
             'Период',
             '${AppDateUtils.formatDate(businessTrip.startDate)} — ${AppDateUtils.formatDate(businessTrip.endDate)}',
           ),
           if (businessTrip.destination != null)
             _buildTripInfoRow(
+              context,
               Icons.location_on_outlined,
               'Направление',
               businessTrip.destination!,
             ),
           _buildTripInfoRow(
+            context,
             Icons.calendar_today_outlined,
             'Всего дней',
             '${businessTrip.totalDays}',
           ),
           _buildTripInfoRow(
+            context,
             Icons.payments_outlined,
             'Суточные',
             _formatCurrency(businessTrip.totalAllowance),
@@ -395,32 +399,32 @@ class DayDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTripInfoRow(IconData icon, String label, String value) {
+  Widget _buildTripInfoRow(BuildContext context, IconData icon, String label, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: context.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.textMuted),
+          Icon(icon, size: 18, color: context.textMuted),
           const SizedBox(width: 10),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
         ],

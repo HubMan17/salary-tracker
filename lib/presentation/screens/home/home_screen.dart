@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: Consumer3<SettingsProvider, CalendarProvider, SalaryProvider>(
         builder: (context, settings, calendar, salary, _) {
           if (settings.isLoading) {
@@ -380,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMonthSelector(CalendarProvider calendar) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -399,10 +399,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Text(
             AppDateUtils.formatMonthYear(calendar.selectedMonth),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           IconButton(
@@ -426,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCalendar(CalendarProvider calendar) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: TableCalendar(
         firstDay: DateTime(2020, 1, 1),
         lastDay: DateTime(2030, 12, 31),
@@ -438,14 +438,14 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
         daysOfWeekHeight: 32,
         rowHeight: 42,
-        daysOfWeekStyle: const DaysOfWeekStyle(
+        daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: TextStyle(
-            color: AppColors.textSecondary,
+            color: context.textSecondary,
             fontWeight: FontWeight.w500,
             fontSize: 12,
           ),
           weekendStyle: TextStyle(
-            color: AppColors.textMuted,
+            color: context.textMuted,
             fontWeight: FontWeight.w500,
             fontSize: 12,
           ),
@@ -523,8 +523,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(
           child: Text(
             '${day.day}',
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: context.textMuted,
               fontSize: 13,
             ),
           ),
@@ -533,32 +533,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Color backgroundColor;
-    Color textColor = AppColors.textPrimary;
+    Color textColor = context.textPrimary;
     Color? borderColor;
     double colorAlpha = isPast ? 0.25 : 0.08;
 
     switch (dayType) {
       case DayType.workDay:
         backgroundColor = AppColors.accentGreen.withValues(alpha: colorAlpha);
-        if (isFuture) textColor = AppColors.textSecondary;
+        if (isFuture) textColor = context.textSecondary;
         break;
       case DayType.weekendWork:
         backgroundColor = AppColors.accentOrange.withValues(alpha: colorAlpha);
-        if (isFuture) textColor = AppColors.textSecondary;
+        if (isFuture) textColor = context.textSecondary;
         break;
       case DayType.dayOff:
         backgroundColor = isFuture
-            ? AppColors.backgroundLight
-            : AppColors.textMuted.withValues(alpha: 0.08);
-        textColor = AppColors.textMuted;
+            ? context.background
+            : context.textMuted.withValues(alpha: 0.08);
+        textColor = context.textMuted;
         break;
       case DayType.sickLeave:
         backgroundColor = AppColors.primaryBlue.withValues(alpha: colorAlpha);
-        if (isFuture) textColor = AppColors.textSecondary;
+        if (isFuture) textColor = context.textSecondary;
         break;
       case DayType.businessTrip:
         backgroundColor = AppColors.primaryPurple.withValues(alpha: colorAlpha);
-        if (isFuture) textColor = AppColors.textSecondary;
+        if (isFuture) textColor = context.textSecondary;
         break;
     }
 
@@ -627,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -642,16 +642,16 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: context.textSecondary,
               fontSize: 12,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: context.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -664,7 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardBackground,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -725,7 +725,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Icon(
             isActive ? activeIcon : icon,
-            color: isActive ? AppColors.primaryPurple : AppColors.textMuted,
+            color: isActive ? AppColors.primaryPurple : context.textMuted,
             size: 24,
           ),
           const SizedBox(height: 4),
@@ -733,7 +733,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label,
             style: TextStyle(
               fontSize: 10,
-              color: isActive ? AppColors.primaryPurple : AppColors.textMuted,
+              color: isActive ? AppColors.primaryPurple : context.textMuted,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -757,9 +757,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.settings_outlined,
-                    color: AppColors.textMuted,
+                    color: context.textMuted,
                     size: 24,
                   ),
                   if (updateProvider.hasUpdate)
@@ -773,7 +773,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppColors.accentGreen,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white,
+                            color: context.cardBackground,
                             width: 1,
                           ),
                         ),
@@ -782,11 +782,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Настройки',
                 style: TextStyle(
                   fontSize: 10,
-                  color: AppColors.textMuted,
+                  color: context.textMuted,
                 ),
               ),
             ],

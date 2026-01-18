@@ -54,14 +54,22 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
       fieldStartLabelText: 'Дата начала',
       fieldEndLabelText: 'Дата окончания',
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primaryPurple,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
+            colorScheme: isDark
+                ? ColorScheme.dark(
+                    primary: AppColors.primaryPurple,
+                    onPrimary: Colors.white,
+                    surface: AppColors.cardBackgroundDark,
+                    onSurface: AppColors.textPrimaryDark,
+                  )
+                : const ColorScheme.light(
+                    primary: AppColors.primaryPurple,
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: AppColors.textPrimary,
+                  ),
           ),
           child: child!,
         );
@@ -128,7 +136,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.background,
       body: CustomScrollView(
         slivers: [
           _buildHeader(),
@@ -203,7 +211,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   Widget _buildDatesCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -222,12 +230,12 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Даты командировки',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -238,7 +246,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: context.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _startDate != null
@@ -262,14 +270,14 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: _startDate != null
-                            ? AppColors.textPrimary
-                            : AppColors.textMuted,
+                            ? context.textPrimary
+                            : context.textMuted,
                       ),
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right,
-                    color: AppColors.textMuted,
+                    color: context.textMuted,
                   ),
                 ],
               ),
@@ -283,7 +291,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   Widget _buildDetailsCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -302,12 +310,12 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Детали',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -315,19 +323,19 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
           const SizedBox(height: 20),
           TextField(
             controller: _destinationController,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: 'Город назначения',
-              hintStyle: const TextStyle(color: AppColors.textMuted),
-              prefixIcon: const Icon(
+              hintStyle: TextStyle(color: context.textMuted),
+              prefixIcon: Icon(
                 Icons.location_on_outlined,
-                color: AppColors.textMuted,
+                color: context.textMuted,
               ),
               filled: true,
-              fillColor: AppColors.backgroundLight,
+              fillColor: context.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -337,19 +345,19 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _descriptionController,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: 'Описание (опционально)',
-              hintStyle: const TextStyle(color: AppColors.textMuted),
-              prefixIcon: const Icon(
+              hintStyle: TextStyle(color: context.textMuted),
+              prefixIcon: Icon(
                 Icons.notes_outlined,
-                color: AppColors.textMuted,
+                color: context.textMuted,
               ),
               filled: true,
-              fillColor: AppColors.backgroundLight,
+              fillColor: context.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -365,7 +373,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   Widget _buildCalculationCard() {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card,
+      decoration: context.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -384,12 +392,12 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Расчёт суточных',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -450,28 +458,28 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: context.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.textMuted),
+          Icon(icon, size: 18, color: context.textMuted),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
         ],

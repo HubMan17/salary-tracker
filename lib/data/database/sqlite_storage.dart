@@ -21,9 +21,16 @@ class SqliteStorage implements StorageInterface {
 
     _database = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE settings ADD COLUMN theme_mode TEXT DEFAULT "system"');
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -32,7 +39,8 @@ class SqliteStorage implements StorageInterface {
         id INTEGER PRIMARY KEY,
         monthly_salary REAL NOT NULL,
         notifications_enabled INTEGER DEFAULT 1,
-        notify_days_before INTEGER DEFAULT 2
+        notify_days_before INTEGER DEFAULT 2,
+        theme_mode TEXT DEFAULT "system"
       )
     ''');
 
@@ -64,6 +72,7 @@ class SqliteStorage implements StorageInterface {
       'monthly_salary': 0,
       'notifications_enabled': 1,
       'notify_days_before': 2,
+      'theme_mode': 'system',
     });
   }
 
