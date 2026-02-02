@@ -232,7 +232,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           _buildBreakdownDetails(context, summary),
           const SizedBox(height: 16),
           _buildDaysStats(context, summary),
-          const SizedBox(height: 32),
+          SizedBox(height: 32 + MediaQuery.of(context).padding.bottom),
         ],
       ),
     );

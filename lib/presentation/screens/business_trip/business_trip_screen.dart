@@ -90,10 +90,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
 
   double get _totalAllowance {
     if (_startDate == null || _endDate == null) return 0;
-    if (_totalDays == 1) return AppConstants.dailyAllowanceFirstLast;
-    if (_totalDays == 2) return AppConstants.dailyAllowanceFirstLast * 2;
-    return AppConstants.dailyAllowanceFirstLast * 2 +
-        AppConstants.dailyAllowanceMiddle * (_totalDays - 2);
+    return _totalDays * AppConstants.dailyAllowance;
   }
 
   String _formatCurrency(double amount) {
@@ -203,6 +200,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
           _buildCalculationCard(),
           const SizedBox(height: 24),
           _buildCreateButton(),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
         ],
       ),
     );
@@ -410,15 +408,9 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
           ),
           const SizedBox(height: 8),
           _buildCalcRow(
-            'Первый/последний день',
-            _formatCurrency(AppConstants.dailyAllowanceFirstLast),
-            Icons.looks_one_outlined,
-          ),
-          const SizedBox(height: 8),
-          _buildCalcRow(
-            'Средние дни',
-            _formatCurrency(AppConstants.dailyAllowanceMiddle),
-            Icons.looks_two_outlined,
+            'Суточные за день',
+            _formatCurrency(AppConstants.dailyAllowance),
+            Icons.payments_outlined,
           ),
           const SizedBox(height: 16),
           Container(

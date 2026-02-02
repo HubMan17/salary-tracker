@@ -176,6 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildVersionCard(),
               const SizedBox(height: 16),
               _buildInfoCard(),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
             ],
           ),
         );

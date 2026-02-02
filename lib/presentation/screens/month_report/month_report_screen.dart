@@ -244,7 +244,7 @@ class _MonthReportScreenState extends State<MonthReportScreen> {
           _buildLegend(context),
           const SizedBox(height: 16),
           _buildDaysList(context, reportItems),
-          const SizedBox(height: 32),
+          SizedBox(height: 32 + MediaQuery.of(context).padding.bottom),
         ],
       ),
     );

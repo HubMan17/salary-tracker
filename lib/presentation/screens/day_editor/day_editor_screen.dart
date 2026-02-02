@@ -208,6 +208,7 @@ class _DayEditorScreenState extends State<DayEditorScreen> {
           _buildBonusCard(),
           const SizedBox(height: 24),
           _buildSaveButton(),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
         ],
       ),
     );

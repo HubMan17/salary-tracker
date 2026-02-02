@@ -371,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildCalendar(calendar),
           const SizedBox(height: 16),
           _buildQuickStats(salary),
-          const SizedBox(height: 80),
+          SizedBox(height: 80 + MediaQuery.of(context).padding.bottom),
         ],
       ),
     );

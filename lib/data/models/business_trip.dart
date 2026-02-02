@@ -21,15 +21,7 @@ class BusinessTrip {
   }
 
   double calculateDailyAllowance(DateTime day) {
-    final dayOnly = AppDateUtils.dateOnly(day);
-    final startOnly = AppDateUtils.dateOnly(startDate);
-    final endOnly = AppDateUtils.dateOnly(endDate);
-
-    if (AppDateUtils.isSameDay(dayOnly, startOnly) ||
-        AppDateUtils.isSameDay(dayOnly, endOnly)) {
-      return AppConstants.dailyAllowanceFirstLast;
-    }
-    return AppConstants.dailyAllowanceMiddle;
+    return AppConstants.dailyAllowance;
   }
 
   bool containsDate(DateTime date) {

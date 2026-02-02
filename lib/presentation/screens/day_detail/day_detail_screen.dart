@@ -6,14 +6,152 @@ import '../../providers/calendar_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/salary_provider.dart';
 
-class DayDetailScreen extends StatelessWidget {
+class DayDetailScreen extends StatefulWidget {
   const DayDetailScreen({super.key});
 
+  @override
+  State<DayDetailScreen> createState() => _DayDetailScreenState();
+}
+
+class _DayDetailScreenState extends State<DayDetailScreen> {
   String _formatCurrency(double amount) {
     return '${amount.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]} ',
         )} ₽';
+  }
+
+  Future<void> _showTripOptionsDialog(DateTime date, dynamic businessTrip) async {
+    final calendar = context.read<CalendarProvider>();
+
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: context.textMuted.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Действия с командировкой',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: context.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildOptionTile(
+              ctx,
+              icon: Icons.event_busy_outlined,
+              title: 'Открепить этот день',
+              subtitle: 'День станет обычным рабочим',
+              color: AppColors.accentOrange,
+              value: 'unlink_day',
+            ),
+            const SizedBox(height: 12),
+            _buildOptionTile(
+              ctx,
+              icon: Icons.delete_sweep_outlined,
+              title: 'Удалить всю командировку',
+              subtitle: '${AppDateUtils.formatDate(businessTrip.startDate)} — ${AppDateUtils.formatDate(businessTrip.endDate)}',
+              color: AppColors.accentRed,
+              value: 'delete_trip',
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+
+    if (result == 'unlink_day' && mounted) {
+      await calendar.deleteDay(date);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } else if (result == 'delete_trip' && mounted) {
+      await calendar.deleteBusinessTrip(businessTrip.id);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Widget _buildOptionTile(
+    BuildContext ctx, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required String value,
+  }) {
+    return InkWell(
+      onTap: () => Navigator.pop(ctx, value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: context.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: context.textMuted,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -141,8 +279,9 @@ class DayDetailScreen extends StatelessWidget {
           ],
           if (businessTrip != null) ...[
             const SizedBox(height: 16),
-            _buildTripCard(context, businessTrip),
+            _buildTripCard(context, date, businessTrip),
           ],
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
         ],
       ),
     );
@@ -336,7 +475,7 @@ class DayDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTripCard(BuildContext context, dynamic businessTrip) {
+  Widget _buildTripCard(BuildContext context, DateTime date, dynamic businessTrip) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: context.cardDecoration,
@@ -358,13 +497,24 @@ class DayDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'Командировка',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: context.textPrimary,
+              Expanded(
+                child: Text(
+                  'Командировка',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: context.textPrimary,
+                  ),
                 ),
+              ),
+              IconButton(
+                onPressed: () => _showTripOptionsDialog(date, businessTrip),
+                icon: Icon(
+                  Icons.more_vert,
+                  color: context.textSecondary,
+                  size: 22,
+                ),
+                tooltip: 'Действия с командировкой',
               ),
             ],
           ),
